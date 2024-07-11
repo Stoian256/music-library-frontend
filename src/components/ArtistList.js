@@ -1,8 +1,11 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 const ArtistList = ({onArtistClick}) => {
     const [artists, setArtists] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         const fetchArtists = async () => {
@@ -17,16 +20,38 @@ const ArtistList = ({onArtistClick}) => {
         fetchArtists();
     }, []);
 
+    const handleSearchChange = async (event, value) => {
+        setSearchTerm(value);
+
+        try {
+            const response = await axios.get(`/search?name=${encodeURIComponent(value)}`);
+            setArtists(response.data);
+        } catch (error) {
+            console.error('Error searching artists:', error);
+        }
+    };
+
     return (
         <div>
             <h2>Artists</h2>
-            <ul>
-                {artists.map(artist => (
-                    <li key={artist.id}>
-                        <button onClick={() => onArtistClick(artist.id)}>{artist.name}</button>
-                    </li>
-                ))}
-            </ul>
+            <Autocomplete
+                id="artist-search"
+                options={artists}
+                getOptionLabel={(artist) => artist.name}
+                onChange={(event, value) => {
+                    if (value) {
+                        onArtistClick(value.id);
+                    }
+                }}
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Search artists"
+                        variant="outlined"
+                        onChange={(event) => handleSearchChange(event, event.target.value)}
+                    />
+                )}
+            />
         </div>
     );
 };
