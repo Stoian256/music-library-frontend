@@ -26,6 +26,7 @@ const AlbumList = ({artistId, onAlbumClick}) => {
                 {albums.map(album => (
                     <li key={album.id}>
                         <button onClick={() => onAlbumClick(album.id)}>{album.title}</button>
+                        <p>{album.description}</p>
                     </li>
                 ))}
             </ul>
