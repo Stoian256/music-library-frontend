@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import DOMPurify from 'dompurify';
 
 const ArtistList = ({onArtistClick}) => {
     const [artists, setArtists] = useState([]);
@@ -24,7 +25,10 @@ const ArtistList = ({onArtistClick}) => {
         setSearchTerm(value);
 
         try {
-            const response = await axios.get(`/search?name=${encodeURIComponent(value)}`);
+            // Sanitize the input before sending it to the server
+            const sanitizedSearchTerm = DOMPurify.sanitize(value);
+
+            const response = await axios.get(`/search?name=${encodeURIComponent(sanitizedSearchTerm)}`);
             setArtists(response.data);
         } catch (error) {
             console.error('Error searching artists:', error);
